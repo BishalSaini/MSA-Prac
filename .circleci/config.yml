@@ -7,13 +7,15 @@ jobs:
     steps:
       - checkout
       - run:
-          name: "Create a File"
-          command: echo "This is data from job_one" > workspace_file.txt
+          name: "Create Workspace Directory"
+          command: |
+            mkdir -p workspace
+            echo "This is data from job_one" > workspace/workspace_file.txt
       - run:
-          name: "Verify File Exists"
-          command: ls -l workspace_file.txt
+          name: "Verify Workspace File"
+          command: ls -l workspace
       - persist_to_workspace:
-          root: .
+          root: workspace
           paths:
             - workspace_file.txt
 
@@ -24,7 +26,7 @@ jobs:
       - attach_workspace:
           at: /workspace
       - run:
-          name: "Verify Workspace Attached"
+          name: "Verify Attached Workspace"
           command: ls -l /workspace
       - run:
           name: "Read Workspace File"
