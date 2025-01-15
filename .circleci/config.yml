@@ -9,6 +9,9 @@ jobs:
       - run:
           name: "Create a File"
           command: echo "This is data from job_one" > workspace_file.txt
+      - run:
+          name: "Verify File Exists"
+          command: ls -l workspace_file.txt
       - persist_to_workspace:
           root: .
           paths:
@@ -21,7 +24,7 @@ jobs:
       - attach_workspace:
           at: /workspace
       - run:
-          name: "List Workspace Files"
+          name: "Verify Workspace Attached"
           command: ls -l /workspace
       - run:
           name: "Read Workspace File"
