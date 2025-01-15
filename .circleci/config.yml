@@ -25,11 +25,11 @@ jobs:
     steps:
       - checkout  # Checkout the code
       - attach_workspace:
-          at: my_workspace  # Attach the workspace to the directory
+          at: /workspace  # Attach the workspace to /workspace directory
       - run:
           name: "Check if workspace content is available"
           command: |
-            if [ "$(cat my_workspace/echo-output)" = "Trying out workspaces" ]; then
+            if [ "$(cat /workspace/my_workspace/echo-output)" = "Trying out workspaces" ]; then
               echo "It worked"
             else
               echo "It failed" && exit 1
