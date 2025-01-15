@@ -3,29 +3,29 @@ version: 2.1
 jobs:
   job_one:
     docker:
-      - image: cimg/ruby:2.6.8  # Ruby Docker image 2.6.8
+      - image: cimg/ruby:2.6.8
     steps:
-      - checkout  # Checkout the code
+      - checkout
       - run:
           name: "Create a File"
-          command: |
-            echo "This is data from job_one" > workspace_file.txt
+          command: echo "This is data from job_one" > workspace_file.txt
       - persist_to_workspace:
           root: .
           paths:
-            - workspace_file.txt  # Persist file to workspace
+            - workspace_file.txt
 
   job_two:
     docker:
-      - image: cimg/ruby:3.2  # Updated Ruby Docker image
+      - image: cimg/ruby:3.2
     steps:
       - attach_workspace:
-          at: /workspace  # Attach the workspace
+          at: /workspace
+      - run:
+          name: "List Workspace Files"
+          command: ls -l /workspace
       - run:
           name: "Read Workspace File"
-          command: |
-            cat /workspace/workspace_file.txt
-            echo "Job_two successfully read the file from job_one workspace."
+          command: cat /workspace/workspace_file.txt
 
 workflows:
   version: 2
@@ -34,4 +34,4 @@ workflows:
       - job_one
       - job_two:
           requires:
-            - job_one  # job_two depends on job_one
+            - job_one
