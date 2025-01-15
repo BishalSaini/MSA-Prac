@@ -3,39 +3,37 @@ version: 2.1
 jobs:
   job_one:
     docker:
-      - image: cimg/ruby:2.6.8
+      - image: cimg/ruby:3.8.2  # Use the Ruby Docker image
     steps:
-      - checkout
+      - checkout  # Checkout the code
       - run:
-          name: "Create Workspace Directory"
-          command: |
-            mkdir -p workspace
-            echo "This is data from job_one" > workspace/workspace_file.txt
+          name: "Echo first hello"
+          command: echo "A first hello"
       - run:
-          name: "Verify Workspace Directory and File"
+          name: "Create workspace and file"
           command: |
-            ls -l workspace
-            cat workspace/workspace_file.txt
+            mkdir -p my_workspace
+            echo "Trying out workspaces" > my_workspace/echo-output
       - persist_to_workspace:
-          root: workspace
+          root: my_workspace  # The root folder where the file is created
           paths:
-            - workspace_file.txt
+            - echo-output  # The file to persist in the workspace
 
   job_two:
     docker:
-      - image: cimg/ruby:3.2
+      - image: cimg/ruby:3.8.2  # Use the Ruby Docker image
     steps:
+      - checkout  # Checkout the code
       - attach_workspace:
-          at: /workspace
+          at: my_workspace  # Attach the workspace to the directory
       - run:
-          name: "Verify Attached Workspace"
+          name: "Check if workspace content is available"
           command: |
-            ls -l /workspace
-            cat /workspace/workspace_file.txt
-      - run:
-          name: "Echo Workspace Content"
-          command: |
-            echo "Successfully read: $(cat /workspace/workspace_file.txt)"
+            if [ "$(cat my_workspace/echo-output)" = "Trying out workspaces" ]; then
+              echo "It worked"
+            else
+              echo "It failed" && exit 1
+            fi
 
 workflows:
   version: 2
