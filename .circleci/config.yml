@@ -12,8 +12,10 @@ jobs:
             mkdir -p workspace
             echo "This is data from job_one" > workspace/workspace_file.txt
       - run:
-          name: "Verify Workspace File"
-          command: ls -l workspace
+          name: "Verify Workspace Directory and File"
+          command: |
+            ls -l workspace
+            cat workspace/workspace_file.txt
       - persist_to_workspace:
           root: workspace
           paths:
@@ -27,10 +29,12 @@ jobs:
           at: /workspace
       - run:
           name: "Verify Attached Workspace"
-          command: ls -l /workspace
+          command: |
+            ls -l /workspace
+            cat /workspace/workspace_file.txt
       - run:
-          name: "Read Workspace File"
-          command: cat /workspace/workspace_file.txt
+          name: "Echo Workspace Content"
+          command: echo "Successfully read: $(cat /workspace/workspace_file.txt)"
 
 workflows:
   version: 2
