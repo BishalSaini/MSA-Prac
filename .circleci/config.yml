@@ -1,22 +1,33 @@
 version: 2.1
 
-orbs:
-  node: circleci/node@4.7.0
-
 jobs:
-  build:
-    executor:
-      name: node/default
+  job_one:
+    docker:
+      - image: cimg/ruby:2.6.8  # Ruby Docker image 2.6.8 
+      auth: 
+        username:vishal32saini@gmail.com 
+        password:vishu032saini
     steps:
-      - checkout
-      - node/install-packages:
-          pkg-manager: npm
+      - checkout  # Checkout the code
       - run:
-          name: "Run tests"
-          command: npm run test
+          name: "Echo Hello World"
+          command: echo "First Hello World... by Vishu"
+      - run:
+          name: "Sleep"
+          command: sleep 25
+
+  job_two:
+    docker:
+      - image: cimg/ruby:3.8.2  # Ruby Docker image 3.8.2
+    steps:
+      - checkout  # Checkout the code
+      - run:
+          name: "Echo Hello World"
+          command: echo "Second Hello World... by Vishu"
 
 workflows:
   version: 2
-  build-deploy:
+  build:
     jobs:
-      - build
+      - job_one
+      - job_two
