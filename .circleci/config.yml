@@ -7,24 +7,31 @@ jobs:
     steps:
       - checkout  # Checkout the code
       - run:
-          name: "Echo Hello World"
-          command: echo "First Hello World... by Vishu"
-      - run:
-          name: "Sleep"
-          command: sleep 25
+          name: "Create a File"
+          command: |
+            echo "This is data from job_one" > workspace_file.txt
+      - persist_to_workspace:
+          root: .
+          paths:
+            - workspace_file.txt  # Persist file to workspace
 
   job_two:
     docker:
       - image: cimg/ruby:3.2  # Updated Ruby Docker image
     steps:
-      - checkout  # Checkout the code
+      - attach_workspace:
+          at: /workspace  # Attach the workspace
       - run:
-          name: "Echo Hello World"
-          command: echo "Second Hello World... by Vishu"
+          name: "Read Workspace File"
+          command: |
+            cat /workspace/workspace_file.txt
+            echo "Job_two successfully read the file from job_one workspace."
 
 workflows:
   version: 2
   build:
     jobs:
       - job_one
-      - job_two
+      - job_two:
+          requires:
+            - job_one  # job_two depends on job_one
