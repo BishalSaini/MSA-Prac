@@ -34,7 +34,8 @@ jobs:
             cat /workspace/workspace_file.txt
       - run:
           name: "Echo Workspace Content"
-          command: echo "Successfully read: $(cat /workspace/workspace_file.txt)"
+          command: |
+            echo "Successfully read: $(cat /workspace/workspace_file.txt)"
 
 workflows:
   version: 2
