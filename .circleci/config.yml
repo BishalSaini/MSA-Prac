@@ -15,7 +15,7 @@ jobs:
 
   job_two:
     docker:
-      - image: cimg/ruby:3.8.2  # Ruby Docker image 3.8.2
+      - image: cimg/ruby:3.2  # Updated Ruby Docker image
     steps:
       - checkout  # Checkout the code
       - run:
