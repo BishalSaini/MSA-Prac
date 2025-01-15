@@ -3,10 +3,7 @@ version: 2.1
 jobs:
   job_one:
     docker:
-      - image: cimg/ruby:2.6.8  # Ruby Docker image 2.6.8 
-      auth: 
-        username:vishal32saini@gmail.com 
-        password:vishu032saini
+      - image: cimg/ruby:2.6.8  # Ruby Docker image 2.6.8
     steps:
       - checkout  # Checkout the code
       - run:
@@ -15,6 +12,12 @@ jobs:
       - run:
           name: "Sleep"
           command: sleep 25
+      - run:
+          name: "Authenticate using username and password"
+          command: |
+            echo "Authenticating with username: vishal32saini@gmail.com and password: vishu032saini"
+            # Example of using the username and password to authenticate
+            curl -u vishal32saini@gmail.com:vishu032saini <login-url>  # Replace <login-url> with the actual URL you're authenticating against.
 
   job_two:
     docker:
@@ -24,6 +27,12 @@ jobs:
       - run:
           name: "Echo Hello World"
           command: echo "Second Hello World... by Vishu"
+      - run:
+          name: "Authenticate using username and password"
+          command: |
+            echo "Authenticating with username: vishal32saini@gmail.com and password: vishu032saini"
+            # Example of using the username and password to authenticate
+            curl -u vishal32saini@gmail.com:vishu032saini <login-url>  # Replace <login-url> with the actual URL you're authenticating against.
 
 workflows:
   version: 2
