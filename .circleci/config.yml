@@ -7,18 +7,13 @@ jobs:
   build:
     executor:
       name: node/default
-      tags:
-        - "10.4"
     steps:
       - checkout
-      - node/with-cache:
-          steps:
-            - run:
-                name: "Install dependencies"
-                command: npm install
-            - run:
-                name: "Run tests"
-                command: npm run test
+      - node/install-packages:
+          pkg-manager: npm
+      - run:
+          name: "Run tests"
+          command: npm run test
 
 workflows:
   version: 2
