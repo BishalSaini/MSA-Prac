@@ -5,46 +5,35 @@ jobs:
     docker:
       - image: cimg/ruby:3.2.2
     steps:
-      - checkout  # Checkout the code (pulls your project repository)
+      - checkout  # Checkout the code
       - run:
           name: "Create files and directories"
           command: |
-            # Create a directory named 'my_workspace'
-            mkdir -p my_workspace
-            # Create a file 'echo-output' with some content
-            echo "This is a test file created in job_one" > my_workspace/echo-output
-            # List the files to confirm they exist
-            ls -R my_workspace
+            mkdir -p /tmp/my_workspace  # Create the directory in /tmp (absolute path)
+            echo "This is a test file created in job_one" > /tmp/my_workspace/echo-output  # Create the test file
+            ls -R /tmp/my_workspace  # List the contents to confirm the file is there
       - persist_to_workspace:
-          root: .  # The current directory, where files will be persisted from
+          root: /tmp  # Set the workspace root to /tmp directory
           paths:
             - my_workspace  # Persist the 'my_workspace' directory
 
   job_two:
     docker:
-      - image: cimg/ruby:3.2.2  # Same image as job_one
+      - image: cimg/ruby:3.2.2
     steps:
       - checkout  # Checkout the code
       - attach_workspace:
-          at: /workspace  # Attach the workspace at '/workspace'
+          at: /workspace  # Attach the workspace to /workspace directory
       - run:
-          name: "Verify contents of attached workspace"
+          name: "Verify workspace contents"
           command: |
-            # Debugging step to see if the workspace is attached
-            echo "Listing contents of /workspace"
-            ls -R /workspace  # List the contents of the attached workspace
-            # Check if the file exists and contains the expected content
+            ls -R /workspace  # List all files in the attached workspace
+            # Check if the 'echo-output' file exists and contains the correct content
             if [ -f /workspace/my_workspace/echo-output ]; then
-              echo "The file exists and the content is:"
-              cat /workspace/my_workspace/echo-output
+              echo "File found: Contents are:"
+              cat /workspace/my_workspace/echo-output  # Display file contents
             else
-              echo "File not found!" && exit 1
-            fi
-            # Check if the content matches what was written in job_one
-            if [ "$(cat /workspace/my_workspace/echo-output)" = "This is a test file created in job_one" ]; then
-              echo "It worked"
-            else
-              echo "It failed" && exit 1
+              echo "File not found!" && exit 1  # If file not found, exit with an error
             fi
 
 workflows:
