@@ -3,35 +3,45 @@ version: 2.1
 jobs:
   job_one:
     docker:
-      - image: cimg/ruby:3.2.2  # Ruby version for consistency
+      - image: cimg/ruby:3.2.2
     steps:
-      - checkout  # Checkout the code from your repository
+      - checkout  # Checkout the code (pulls your project repository)
       - run:
-          name: "Create workspace and file"
+          name: "Create files and directories"
           command: |
-            # Create a directory within the workspace
+            # Create a directory named 'my_workspace'
             mkdir -p my_workspace
-            echo "Trying out workspaces" > my_workspace/echo-output
+            # Create a file 'echo-output' with some content
+            echo "This is a test file created in job_one" > my_workspace/echo-output
+            # List the files to confirm they exist
+            ls -R my_workspace
       - persist_to_workspace:
-          root: .  # Use the current directory as the root
+          root: .  # The current directory, where files will be persisted from
           paths:
-            - my_workspace  # Persist the entire directory
+            - my_workspace  # Persist the 'my_workspace' directory
 
   job_two:
     docker:
-      - image: cimg/ruby:3.2.2  # Ruby version for consistency
+      - image: cimg/ruby:3.2.2  # Same image as job_one
     steps:
-      - checkout  # Checkout the code from your repository
+      - checkout  # Checkout the code
       - attach_workspace:
-          at: /workspace  # Attach the workspace to the /workspace directory
+          at: /workspace  # Attach the workspace at '/workspace'
       - run:
-          name: "Check if workspace content is available"
+          name: "Verify contents of attached workspace"
           command: |
-            # Ensure the directory exists
-            mkdir -p /workspace/my_workspace
-            ls -R /workspace  # Debugging step to verify workspace structure
-            # Verify the content of the file from job_one
-            if [ "$(cat /workspace/my_workspace/echo-output)" = "Trying out workspaces" ]; then
+            # Debugging step to see if the workspace is attached
+            echo "Listing contents of /workspace"
+            ls -R /workspace  # List the contents of the attached workspace
+            # Check if the file exists and contains the expected content
+            if [ -f /workspace/my_workspace/echo-output ]; then
+              echo "The file exists and the content is:"
+              cat /workspace/my_workspace/echo-output
+            else
+              echo "File not found!" && exit 1
+            fi
+            # Check if the content matches what was written in job_one
+            if [ "$(cat /workspace/my_workspace/echo-output)" = "This is a test file created in job_one" ]; then
               echo "It worked"
             else
               echo "It failed" && exit 1
