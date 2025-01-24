@@ -3,7 +3,7 @@ version: 2.1
 jobs:
   job_one:
     docker:
-      - image: cimg/ruby:3.2.2  # Use a valid Ruby version
+      - image: cimg/ruby:3.2.2  # Ruby version for consistency
     steps:
       - checkout  # Checkout the code
       - run:
@@ -12,31 +12,34 @@ jobs:
       - run:
           name: "Create workspace and file"
           command: |
+            # Create a workspace directory and add a file
             mkdir -p my_workspace
             echo "Trying out workspaces" > my_workspace/echo-output
       - run:
           name: "Debug workspace in job_one"
           command: ls -R my_workspace  # Debugging step to verify the workspace
       - persist_to_workspace:
-          root: my_workspace
+          root: .  # The current directory (root of the workspace)
           paths:
-            - echo-output
+            - my_workspace/echo-output  # Persist only the file
 
   job_two:
     docker:
-      - image: cimg/ruby:3.2.2  # Use the same Ruby version as job_one
+      - image: cimg/ruby:3.2.2  # Ruby version for consistency
     steps:
       - checkout  # Checkout the code
       - attach_workspace:
-          at: /workspace  # Attach the workspace to /workspace directory
+          at: /workspace  # Attach the workspace to the /workspace directory in the job
       - run:
           name: "Ensure workspace directory exists"
           command: |
-            mkdir -p /workspace/my_workspace  # Create the directory if it does not exist
+            # Create the workspace directory if it does not exist
+            mkdir -p /workspace/my_workspace
             ls -R /workspace  # Debugging step to verify workspace structure
       - run:
           name: "Check if workspace content is available"
           command: |
+            # Check if the file content matches the expected output
             if [ "$(cat /workspace/my_workspace/echo-output)" = "Trying out workspaces" ]; then
               echo "It worked"
             else
@@ -50,4 +53,4 @@ workflows:
       - job_one
       - job_two:
           requires:
-            - job_one
+            - job_one  # Ensure job_two runs after job_one
