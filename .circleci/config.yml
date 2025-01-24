@@ -30,8 +30,10 @@ jobs:
       - attach_workspace:
           at: /workspace  # Attach the workspace to /workspace directory
       - run:
-          name: "Debug attached workspace in job_two"
-          command: ls -R /workspace  # Debugging step to verify workspace attachment
+          name: "Ensure workspace directory exists"
+          command: |
+            mkdir -p /workspace/my_workspace  # Create the directory if it does not exist
+            ls -R /workspace  # Debugging step to verify workspace structure
       - run:
           name: "Check if workspace content is available"
           command: |
@@ -49,4 +51,3 @@ workflows:
       - job_two:
           requires:
             - job_one
- 
