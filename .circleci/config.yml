@@ -9,31 +9,31 @@ jobs:
       - run:
           name: "Create files and directories"
           command: |
-            mkdir -p /tmp/my_workspace  # Create the directory in /tmp (absolute path)
-            echo "This is a test file created in job_one" > /tmp/my_workspace/echo-output  # Create the test file
-            ls -R /tmp/my_workspace  # List the contents to confirm the file is there
-      - persist_to_workspace:
-          root: /tmp  # Set the workspace root to /tmp directory
+            mkdir -p /tmp/my_workspace
+            echo "This is a test file created in job_one" > /tmp/my_workspace/echo-output
+            ls -R /tmp/my_workspace
+      - save_cache:
+          key: my_workspace-cache
           paths:
-            - my_workspace  # Persist the 'my_workspace' directory
+            - /tmp/my_workspace
 
   job_two:
     docker:
       - image: cimg/ruby:3.2.2
     steps:
       - checkout  # Checkout the code
-      - attach_workspace:
-          at: /workspace  # Attach the workspace to /workspace directory
+      - restore_cache:
+          keys:
+            - my_workspace-cache
       - run:
           name: "Verify workspace contents"
           command: |
-            ls -R /workspace  # List all files in the attached workspace
-            # Check if the 'echo-output' file exists and contains the correct content
-            if [ -f /workspace/my_workspace/echo-output ]; then
+            ls -R /tmp/my_workspace  # List all files in the restored cache
+            if [ -f /tmp/my_workspace/echo-output ]; then
               echo "File found: Contents are:"
-              cat /workspace/my_workspace/echo-output  # Display file contents
+              cat /tmp/my_workspace/echo-output
             else
-              echo "File not found!" && exit 1  # If file not found, exit with an error
+              echo "File not found!" && exit 1
             fi
 
 workflows:
@@ -43,4 +43,4 @@ workflows:
       - job_one
       - job_two:
           requires:
-            - job_one  # Ensure job_two runs after job_one
+            - job_one
