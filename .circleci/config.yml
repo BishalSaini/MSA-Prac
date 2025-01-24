@@ -5,41 +5,32 @@ jobs:
     docker:
       - image: cimg/ruby:3.2.2  # Ruby version for consistency
     steps:
-      - checkout  # Checkout the code
-      - run:
-          name: "Echo first hello"
-          command: echo "A first hello"
+      - checkout  # Checkout the code from your repository
       - run:
           name: "Create workspace and file"
           command: |
-            # Create a workspace directory and add a file
+            # Create a directory within the workspace
             mkdir -p my_workspace
             echo "Trying out workspaces" > my_workspace/echo-output
-      - run:
-          name: "Debug workspace in job_one"
-          command: ls -R my_workspace  # Debugging step to verify the workspace
       - persist_to_workspace:
-          root: .  # The current directory (root of the workspace)
+          root: .  # Use the current directory as the root
           paths:
-            - my_workspace/echo-output  # Persist only the file
+            - my_workspace  # Persist the entire directory
 
   job_two:
     docker:
       - image: cimg/ruby:3.2.2  # Ruby version for consistency
     steps:
-      - checkout  # Checkout the code
+      - checkout  # Checkout the code from your repository
       - attach_workspace:
-          at: /workspace  # Attach the workspace to the /workspace directory in the job
-      - run:
-          name: "Ensure workspace directory exists"
-          command: |
-            # Create the workspace directory if it does not exist
-            mkdir -p /workspace/my_workspace
-            ls -R /workspace  # Debugging step to verify workspace structure
+          at: /workspace  # Attach the workspace to the /workspace directory
       - run:
           name: "Check if workspace content is available"
           command: |
-            # Check if the file content matches the expected output
+            # Ensure the directory exists
+            mkdir -p /workspace/my_workspace
+            ls -R /workspace  # Debugging step to verify workspace structure
+            # Verify the content of the file from job_one
             if [ "$(cat /workspace/my_workspace/echo-output)" = "Trying out workspaces" ]; then
               echo "It worked"
             else
