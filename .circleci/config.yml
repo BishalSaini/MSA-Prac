@@ -3,9 +3,9 @@ version: 2.1
 jobs:
   job_one:
     docker:
-      - image: cimg/ruby:3.8.2  # Use the Ruby Docker image
+      - image: cimg/ruby:3.2.2  # Use a valid Ruby version
     steps:
-      - checkout  # Checkout the code
+      - checkout
       - run:
           name: "Echo first hello"
           command: echo "A first hello"
@@ -15,17 +15,17 @@ jobs:
             mkdir -p my_workspace
             echo "Trying out workspaces" > my_workspace/echo-output
       - persist_to_workspace:
-          root: my_workspace  # The root folder where the file is created
+          root: my_workspace
           paths:
-            - echo-output  # The file to persist in the workspace
+            - echo-output
 
   job_two:
     docker:
-      - image: cimg/ruby:3.8.2  # Use the Ruby Docker image
+      - image: cimg/ruby:3.2.2  # Use the same valid Ruby version
     steps:
-      - checkout  # Checkout the code
+      - checkout
       - attach_workspace:
-          at: /workspace  # Attach the workspace to /workspace directory
+          at: /workspace
       - run:
           name: "Check if workspace content is available"
           command: |
